@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\log;
+use App\Providers\LogsHistory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log as FacadesLog;
 
 class LogController extends Controller
@@ -76,7 +79,12 @@ class LogController extends Controller
     public function getalllogs(){
         $users = log::with('usuarioLog')->get();
 
-
+        event(new LogsHistory(
+            Auth::user()->id,
+            Auth::user()->nick,
+            Config::get('constants.pages.page_administrador'),
+            Config::get('constants.actions.user_logs'),
+        ));
 
         return $users;
     }

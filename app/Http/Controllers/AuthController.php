@@ -246,6 +246,13 @@ class AuthController extends Controller
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
+        event(new LogsHistory(
+            $user->id,
+            $user->nick,
+            Config::get('constants.pages.page_login'),
+            Config::get('constants.actions.login'),
+        ));
+
         return response()->json([
             'access_token' => $token,
             'token_type' => 'Bearer',

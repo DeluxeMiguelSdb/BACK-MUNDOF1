@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\comentario;
+use App\Providers\LogsHistory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 
 class ComentarioController extends Controller
 {
@@ -89,6 +92,14 @@ class ComentarioController extends Controller
     public function eliminarcomentario($id)
     {
         $comentario = comentario::findorFail($id);
+
+        event(new LogsHistory(
+            Auth::user()->id,
+            Auth::user()->nick,
+            Config::get('constants.pages.page_noticia'),
+            Config::get('constants.actions.delete_comment'),
+        ));
+        
         if ($comentario->delete()) {
             return response()->json(['Borrado Correctamente'], 200);
         }
@@ -102,6 +113,13 @@ class ComentarioController extends Controller
             'idUsuario' => $request->idUsuario,
             'nombreUsuario' => $request->nombreUsuario,
         ]);
+
+        event(new LogsHistory(
+            Auth::user()->id,
+            Auth::user()->nick,
+            Config::get('constants.pages.page_noticia'),
+            Config::get('constants.actions.add_comment'),
+        ));
 
 
         return response()->json([$comentario->id], 200);
